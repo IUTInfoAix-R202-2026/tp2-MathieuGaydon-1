@@ -51,6 +51,10 @@ public class ProprieteSimple {
     //    - "anIntProperty = " + anIntProperty (appelle toString())
     //    - "anIntProperty.get() = " + anIntProperty.get()
     //    - "anIntProperty.getValue() = " + anIntProperty.getValue()
+    SimpleIntegerProperty anIntProperty = new SimpleIntegerProperty(1024);
+    System.out.println("anIntProperty = " + anIntProperty);
+    System.out.println("anIntProperty.get() = " + anIntProperty.get());
+    System.out.println("anIntProperty.getValue() = " + anIntProperty.get());
   }
 
   /**
@@ -99,6 +103,22 @@ public class ProprieteSimple {
     //
     // 8. Afficher "set() with 1024." puis appeler set(1024).
     //    -> Rien ne se passe (listener retiré).
+    System.out.println();
+    System.out.println("Add invalidation listener.");
+    this.invalidationListener =
+        observable -> System.out.println("The observable has been invalidated.");
+    anIntProperty.addListener(invalidationListener);
+    System.out.println("setValue() with 1024.");
+    anIntProperty.setValue(1024);
+    System.out.println("set() with 2105.");
+    anIntProperty.setValue(2105);
+    System.out.println("setValue() with 5012.");
+    anIntProperty.setValue(5012);
+    System.out.println("Remove invalidation listener.");
+    anIntProperty.removeListener(invalidationListener);
+    System.out.println("set() with 1024.");
+    anIntProperty.setValue(1024);
+    anIntProperty.removeListener(invalidationListener);
   }
 
   /**
@@ -145,6 +165,27 @@ public class ProprieteSimple {
     //
     // 8. Afficher "set() with 1024." puis appeler set(1024).
     //    -> Rien (listener retiré).
+    System.out.println();
+    System.out.println("Add change listener.");
+    this.changeListener =
+        (observable, oldValue, newValue) ->
+            System.out.println(
+                "The observableValue has changed: oldValue = "
+                    + oldValue
+                    + ", newValue = "
+                    + newValue);
+    anIntProperty.addListener(changeListener);
+    System.out.println("setValue() with 1024.");
+    anIntProperty.setValue(1024);
+    System.out.println("set() with 2105.");
+    anIntProperty.setValue(2105);
+    System.out.println("setValue() with 5012.");
+    anIntProperty.setValue(5012);
+    System.out.println("Remove change listener.");
+    anIntProperty.removeListener(changeListener);
+    System.out.println("set() with 1024.");
+    anIntProperty.setValue(1024);
+    anIntProperty.removeListener(changeListener);
   }
 
   public int getAnInt() {
