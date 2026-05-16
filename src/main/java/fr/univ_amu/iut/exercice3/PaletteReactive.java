@@ -1,7 +1,12 @@
 package fr.univ_amu.iut.exercice3;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringExpression;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -52,6 +57,39 @@ public class PaletteReactive extends Application {
     // 5. Appeler createBindings() pour lier le label et la zone aux boutons.
     //
     // 6. Créer la Scene, l'attacher au Stage, afficher.
+
+    BorderPane root = new BorderPane();
+
+    BoutonCouleur btnRouge = new BoutonCouleur("Rouge", "red");
+    btnRouge.setId("btn-rouge");
+
+    BoutonCouleur btnVert = new BoutonCouleur("Vert", "green");
+    btnVert.setId("btn-vert");
+
+    BoutonCouleur btnBleu = new BoutonCouleur("Bleu", "blue");
+    btnBleu.setId("btn-bleu");
+
+    HBox hbox = new HBox(10);
+    hbox.getChildren().addAll(btnRouge, btnVert, btnBleu);
+
+    Pane zone = new Pane();
+    zone.setId("zone");
+    zone.setMinSize(300, 200);
+
+    Label compteurs = new Label();
+    compteurs.setId("compteurs");
+
+    root.setTop(hbox);
+    root.setCenter(zone);
+    root.setBottom(compteurs);
+
+    createBindings(btnRouge, btnVert, btnBleu, zone, compteurs);
+
+    Scene scene = new Scene(root, 400, 300);
+
+    primaryStage.setScene(scene);
+    primaryStage.setTitle("Palette Reactive");
+    primaryStage.show();
   }
 
   /**
@@ -86,6 +124,38 @@ public class PaletteReactive extends Application {
     //
     // 4. (Optionnel) Utiliser Bindings.when() pour afficher "Bienvenue !"
     //    quand aucun bouton n'a été cliqué, et le texte des compteurs sinon.
+    btnRouge
+        .nbClicsProperty()
+        .addListener(
+            (obs, oldVal, newVal) ->
+                zone.setStyle("-fx-background-color: " + btnRouge.getCouleur() + ";"));
+
+    btnVert
+        .nbClicsProperty()
+        .addListener(
+            (obs, oldVal, newVal) ->
+                zone.setStyle("-fx-background-color: " + btnVert.getCouleur() + ";"));
+
+    btnBleu
+        .nbClicsProperty()
+        .addListener(
+            (obs, oldVal, newVal) ->
+                zone.setStyle("-fx-background-color: " + btnBleu.getCouleur() + ";"));
+
+    StringExpression compteursTexte =
+        Bindings.concat(
+            "Rouge: ",
+            btnRouge.nbClicsProperty().asString(),
+            "Vert: ",
+            btnVert.nbClicsProperty().asString(),
+            "Bleu: ",
+            btnBleu.nbClicsProperty().asString());
+    var total =
+        btnRouge.nbClicsProperty().add(btnVert.nbClicsProperty()).add(btnBleu.nbClicsProperty());
+
+    labelCompteurs
+        .textProperty()
+        .bind(Bindings.when(total.isEqualTo(0)).then("Bienvenue !").otherwise(compteursTexte));
   }
 
   public static void main(String[] args) {
